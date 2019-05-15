@@ -76,12 +76,42 @@ BalanceOutput.propTypes = {
 };
 
 export default connect(state => {
+  const {accounts, userInput, journalEntries} = state
   let balance = [];
-
   /* YOUR CODE GOES HERE */
+  for(let i = 0; i < accounts.length; i += 1) {
+    let debit = 0;
+    let credit = 0;
+  
+    for(let j = 0; j < journalEntries.length; j += 1) {
+      //check account number to see if it matches
+      if(accounts[i].ACCOUNT === journalEntries[j].ACCOUNT && userInput.startAccount 
+        //check to filter from starting account number to ending account number
+        <= journalEntries[j].ACCOUNT && userInput.endAccount >= journalEntries[j].ACCOUNT) {
+          if(journalEntries[j].PERIOD >= userInput.startPeriod && journalEntries[j].PERIOD <= userInput.endPeriod) {
+            //if there's a match increment debit and credit
+            debit += journalEntries[j].DEBIT
+            //check if periods are working. 
+            console.log(journalEntries[j])
+            credit += journalEntries[j].CREDIT
+            //difference in balance
+            let newBalance = debit - credit
+            const newObj = {
+              ACCOUNT: accounts[i].ACCOUNT,
+              DESCRIPTION: accounts[i].LABEL,
+              DEBIT: debit,
+              CREDIT: credit,
+              BALANCE: newBalance
+            }
+            balance.push(newObj)
+          }
+      }
+    }
+  }
 
   const totalCredit = balance.reduce((acc, entry) => acc + entry.CREDIT, 0);
   const totalDebit = balance.reduce((acc, entry) => acc + entry.DEBIT, 0);
+
 
   return {
     balance,
@@ -90,3 +120,5 @@ export default connect(state => {
     userInput: state.userInput
   };
 })(BalanceOutput);
+
+
